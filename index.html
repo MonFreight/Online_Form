@@ -1,0 +1,302 @@
+:
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CP72 Customs Declaration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        form {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #1a505b;
+        border-radius: 5px;
+      }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #1a505b;
+            color: hsl(0, 0%, 100%);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #04080d;
+        }
+    </style>
+    <script>
+        function addRow() {
+            const table = document.getElementById("goodsTable");
+            const row = table.insertRow(-1);
+            row.innerHTML = '<td><input type="text"></td>' +
+                            '<td><input type="text"></td>' +
+                            '<td><input type="number"></td>' +
+                            '<td><input type="number" step="0.01"></td>' +
+                            '<td><input type="text"></td>' +
+                            '<td><input type="number" step="0.01"></td>' +
+                            '<td><button type="button" onclick="deleteRow(this)">Delete</button></td>';
+        }
+        
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+        
+        function calculateVolumetricWeight() {
+            let length = parseFloat(document.getElementById("length").value) || 0;
+            let width = parseFloat(document.getElementById("width").value) || 0;
+            let height = parseFloat(document.getElementById("height").value) || 0;
+            let weight = parseFloat(document.getElementById("weight").value) || 0;
+            
+            let volumetricWeight = (length * width * height) / 6000;
+            document.getElementById("volumetricWeight").value = volumetricWeight.toFixed(2);
+            
+            let finalWeight = Math.max(weight, volumetricWeight);
+            document.getElementById("finalWeight").value = finalWeight.toFixed(2);
+        }
+    </script>
+  </head>
+  <body>
+    <script src="script.js"></script>
+    <h2>CP72 Customs Declaration Form</h2>
+    <form id="cp72Form" onsubmit="submitForm(event)">
+        <label for="sender">Sender Name:</label>
+        <input type="text" id="sender" required>
+        
+        <label for="senderAddress">Sender Address:</label>
+        <textarea id="senderAddress" required></textarea>
+        
+        <label for="senderPhone">Sender Phone Number:</label>
+        <input type="text" id="senderPhone" required>
+        
+        <label for="recipient">Recipient Name:</label>
+        <input type="text" id="recipient" required>
+        
+        <label for="recipientPhone">Recipient Phone Number:</label>
+        <input type="text" id="recipientPhone" required>
+            <label for="address">Recipient Address:</label>
+        <textarea id="recipientAddress" required></textarea>
+
+        
+        <label for="description">Goods Description List:</label>
+        <table id="goodsTable" width="100%">
+            <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Weight (kg)</th>
+                <th>Origin</th>
+                <th>Value (AUD)</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="number"></td>
+                <td><input type="number" step="0.01"></td>
+                <td><input type="text"></td>
+                <td><input type="number" step="0.01"></td>
+                <td><button type="button" onclick="deleteRow(this)">Delete</button></td>
+            </tr>
+        </table>
+        <button type="button" onclick="addRow()">Add Row</button>
+        <br><label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" step="0.01" required oninput="calculateVolumetricWeight()">
+        <label for="length">Length (cm):</label>
+        <input type="number" id="length" step="0.01" required oninput="calculateVolumetricWeight()">
+        
+        <label for="width">Width (cm):</label>
+        <input type="number" id="width" step="0.01" required oninput="calculateVolumetricWeight()">
+        
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" step="0.01" required oninput="calculateVolumetricWeight()">
+        
+        <label for="volumetricWeight">Volumetric Weight (kg):</label>
+        <input type="text" id="volumetricWeight" readonly>
+        
+        <label for="finalWeight">Final Chargeable Weight (kg):</label>
+        <input type="text" id="finalWeight" readonly>
+        
+        <label for="value">Declared Value (AUD):</label>
+        <input type="number" id="value" step="0.01" required>
+        <label for="comments">Additional Comments: </label>
+        <textarea id="comments" rows="4" placeholder="Enter any special notes or instructions..."> </textarea>
+        <label for="signature">Signature:</label>
+        <canvas id="signaturePad" width="400" height="150" style="border:1px solid #000;"> </canvas>
+        <button type="button" onclick="clearSignature()">Clear Signature</button>
+
+        <script>
+            var canvas=document.getElementById('signaturePad');
+            var ctx = canvas.getContext('2d');
+            var drawing = false;
+
+            canvas.addEventListener('mousedown', function(e){
+                drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
+            canvas.addEventListener('mousemove', function(e){
+                if(drawing){
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+            });
+            canvas.addEventListener('mouseup', function(){
+                drawing = false;
+            });
+            function clearSignature(){
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            </script>
+            <label for="terms">
+                <input type="checkbox"id="terms"required>
+                I agree to the <a href="https://www.monfreight.com.au/#kat-1bHvZKezbPW3ePE7" target="_blank">Terms and Conditions</a>
+            </label>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+            <button id="generatePdfButton">Generate PDF</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ensure jsPDF is available
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Error: jsPDF library not loaded properly!");
+                return;
+            }
+    
+            const jsPDF = window.jspdf.jsPDF;
+    
+            function generatePDF() {
+                const doc = new jsPDF();                
+                // Fetch form data
+                const sender = document.getElementById("sender")?.value || "No Name Provided";
+                const senderAddress = document.getElementById("senderAddress")?.value || "No Address Provided"
+                const senderPhonenumber = document.getElementById("senderPhone")?.value || "No Phone Number provided"
+                const recipient = document.getElementById("recipient")?.value || "No Name Provided";
+                const recipientAddress = document.getElementById("recipientAddress")?.value || "No Address Provided";
+                const recipientPhonenumber = document.getElementById("recipientPhone")?.value || "No Phone Number provided"
+                const weight = document.getElementById("weight")?.value || "No Weight Provided";
+                const finalWeight = document.getElementById("finalWeight")?.value || "Not calculated";
+                const value = document.getElementById("value")?.value || "No Declared Value";
+                const comments = document.getElementById("comments")?.value || "No Comments Provided";
+    
+                // Add title
+                doc.setFontSize(16);
+                doc.text("MON FREIGHT CP72 Customs Declaration", 50, 15);
+    
+                // Add Sender & Recipient Details
+                doc.setFontSize(12);
+                doc.text(`Sender Name: ${sender}`, 20, 30);
+                doc.text("Sender Address:", 20, 40);
+                doc.text(doc.splitTextToSize(senderAddress, 170), 20, 45)
+                doc.text(`Sender Phone : ${senderPhonenumber}`, 100, 40);
+                doc.text(`Recipient: ${recipient}`, 20, 55);
+                doc.text("Recipient Address:", 20, 65);
+                doc.text(doc.splitTextToSize(recipientAddress, 170), 20, 70);
+                doc.text(`Recipient Phone : ${recipientPhonenumber}`, 100, 65);
+    
+                // Table headers
+                const headers = [["#", "Description", "Quantity", "Weight (kg)", "Origin", "Value (AUD)"]];
+
+                // **Extract Data From Table Dynamically**
+                const data = [];
+                const tableRows = document.querySelectorAll("#goodsTable tr");
+
+                // Skip the header row and process others
+                tableRows.forEach((row, index) => {
+                    if (index === 0) return; // Skip header
+                    const cells = row.querySelectorAll("td");
+
+                    if (cells.length >=6){
+                        const rowData = [
+                            index, // Row #
+                            cells[1].querySelector("input")?.value || "", // Description
+                            cells[2].querySelector("input")?.value || "", // Quantity
+                            cells[3].querySelector("input")?.value || "", // Weight
+                            cells[4].querySelector("input")?.value || "", // Origin
+                            cells[5].querySelector("input")?.value || "", // Value (AUD)
+                        ];
+                        data.push(rowData);
+                    }
+                    const rowData = [
+                        index + 1, // Row Number
+                        cells[1].querySelector('input')?.value || "", // Description
+                        cells[2].querySelector('input')?.value || "", // Quantity
+                        cells[3].querySelector('input')?.value || "", // Weight
+                        cells[4].querySelector('input')?.value || "", // Origin
+                        cells[5].querySelector('input')?.value || ""  // Value (AUD)
+                    ];
+                });
+
+    
+                // Ensure autoTable is available
+                if (doc.autoTable) {
+                    doc.autoTable({
+                        head: headers,
+                        body: data,
+                        startY: 80,
+                        styles: { fontSize: 10, cellPadding: 3 }
+                    });
+                } else {
+                    console.error("autoTable plugin not found!");
+                }
+    
+                // Position for next section
+                let finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 100;
+    
+                // Additional details
+                doc.text(`Total Weight: ${weight} kg`, 20, finalY);
+                doc.text(`Chargeable Weight: ${finalWeight} kg` , 20, finalY + 10);
+                doc.text(`Declared Value: $${value}`, 20, finalY + 20);
+                doc.text("Additional Comments:", 20, finalY + 30);
+                doc.text(doc.splitTextToSize(comments, 170), 20, finalY + 40);
+    
+                // Capture Signature
+                const canvas = document.getElementById("signaturePad");
+                if (canvas) {
+                    const imgData = canvas.toDataURL("image/png");
+                    const today = new Date();
+                    const formattedDate = today.toLocaleDateString();
+    
+                    doc.addImage(imgData, "PNG", 80, finalY + 50, 80, 30);
+                    doc.text(`Sender Name: ${sender}`, 20, finalY + 70);
+                    doc.text(`Date: ${formattedDate}`, 170, finalY + 70);
+                } else {
+                    alert("Signature pad not found!");
+                }
+    
+                // Download PDF
+                doc.save("CP72_Form.pdf");
+            }
+    
+            // Attach event listener to button
+            const button = document.getElementById("generatePdfButton");
+            if (button) {
+                button.addEventListener("click", generatePDF);
+            } else {
+                console.error("Generate PDF button not found!");
+            }
+        });
+    </script>
+  </body>
+</html>
+
